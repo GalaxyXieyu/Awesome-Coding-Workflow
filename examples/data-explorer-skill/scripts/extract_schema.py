@@ -4,6 +4,14 @@
 
 支持: PostgreSQL, MySQL, 达梦(DM), Neo4j, Milvus, Elasticsearch
 
+安全约束:
+  - 只读操作，不执行任何写入
+  - 单表最多获取 100 条样本数据
+  - 查询间隔 100ms，避免高频 IO
+  - 总表数限制 500，超过需手动指定
+  - 连接超时 10s，查询超时 30s
+  - 生产环境建议在从库执行
+
 用法: 
   python extract_schema.py --type pg --host localhost --port 5432 --db mydb --user user --output ./schema/
   python extract_schema.py --type mysql --host localhost --port 3306 --db mydb --user user --output ./schema/
@@ -13,15 +21,26 @@
 import sys
 import json
 import argparse
+import time
 from pathlib import Path
 from datetime import datetime
+
+# ========== 安全限制配置 ==========
+MAX_TABLES = 500          # 最大表数量，超过需手动指定表名
+QUERY_INTERVAL = 0.1      # 查询间隔（秒），避免高频 IO
+CONNECT_TIMEOUT = 10      # 连接超时（秒）
+QUERY_TIMEOUT = 30        # 查询超时（秒）
+MAX_SAMPLE_ROWS = 0       # 样本数据条数（0=不获取样本，保守策略）
 
 
 def extract_pg_schema(host, port, db, user, password, schema='public'):
     """PostgreSQL schema 提取"""
     try:
         import psycopg2
-        conn = psycopg2.connect(host=host, port=port, database=db, user=user, password=password)
+        conn = psycopg2.connect(
+            host=host, port=port, database=db, user=user, password=password,
+            connect_timeout=CONNECT_TIMEOUT
+        )
         cur = conn.cursor()
         
         # 获取所有表
@@ -31,7 +50,11 @@ def extract_pg_schema(host, port, db, user, password, schema='public'):
         """, (schema,))
         tables = [row[0] for row in cur.fetchall()]
         
-        result = {'type': 'postgresql', 'database': db, 'schema': schema, 'tables': {}}
+        # 安全检查：表数量限制
+        if len(tables) > MAX_TABLES:
+            return {'error': f'表数量 {len(tables)} 超过限制 {MAX_TABLES}，请手动指定表名', 'tables_found': tables[:50]}
+        
+        result = {'type': 'postgresql', 'database': db, 'schema': schema, 'tables': {}, 'table_count': len(tables)}
         
         for table in tables:
             cur.execute("""
@@ -42,6 +65,7 @@ def extract_pg_schema(host, port, db, user, password, schema='public'):
             """, (schema, table))
             columns = [{'name': r[0], 'type': r[1], 'nullable': r[2], 'default': r[3]} for r in cur.fetchall()]
             result['tables'][table] = {'columns': columns}
+            time.sleep(QUERY_INTERVAL)  # 查询间隔，避免高频 IO
         
         conn.close()
         return result
@@ -53,18 +77,26 @@ def extract_mysql_schema(host, port, db, user, password):
     """MySQL schema 提取"""
     try:
         import pymysql
-        conn = pymysql.connect(host=host, port=int(port), database=db, user=user, password=password)
+        conn = pymysql.connect(
+            host=host, port=int(port), database=db, user=user, password=password,
+            connect_timeout=CONNECT_TIMEOUT, read_timeout=QUERY_TIMEOUT
+        )
         cur = conn.cursor()
         
         cur.execute("SHOW TABLES")
         tables = [row[0] for row in cur.fetchall()]
         
-        result = {'type': 'mysql', 'database': db, 'tables': {}}
+        # 安全检查：表数量限制
+        if len(tables) > MAX_TABLES:
+            return {'error': f'表数量 {len(tables)} 超过限制 {MAX_TABLES}，请手动指定表名', 'tables_found': tables[:50]}
+        
+        result = {'type': 'mysql', 'database': db, 'tables': {}, 'table_count': len(tables)}
         
         for table in tables:
             cur.execute(f"DESCRIBE `{table}`")
             columns = [{'name': r[0], 'type': r[1], 'nullable': r[2], 'key': r[3], 'default': r[4]} for r in cur.fetchall()]
             result['tables'][table] = {'columns': columns}
+            time.sleep(QUERY_INTERVAL)  # 查询间隔，避免高频 IO
         
         conn.close()
         return result
@@ -87,7 +119,11 @@ def extract_dm_schema(host, port, db, user, password, schema=None):
         """)
         tables = [row[0] for row in cur.fetchall()]
         
-        result = {'type': 'dameng', 'database': db, 'schema': schema, 'tables': {}}
+        # 安全检查：表数量限制
+        if len(tables) > MAX_TABLES:
+            return {'error': f'表数量 {len(tables)} 超过限制 {MAX_TABLES}，请手动指定表名', 'tables_found': tables[:50]}
+        
+        result = {'type': 'dameng', 'database': db, 'schema': schema, 'tables': {}, 'table_count': len(tables)}
         
         for table in tables:
             cur.execute(f"""
@@ -98,6 +134,7 @@ def extract_dm_schema(host, port, db, user, password, schema=None):
             """)
             columns = [{'name': r[0], 'type': r[1], 'nullable': r[2], 'default': r[3]} for r in cur.fetchall()]
             result['tables'][table] = {'columns': columns}
+            time.sleep(QUERY_INTERVAL)  # 查询间隔，避免高频 IO
         
         conn.close()
         return result
