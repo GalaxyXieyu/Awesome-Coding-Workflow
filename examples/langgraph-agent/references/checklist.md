@@ -56,10 +56,30 @@
 - [ ] 节点返回结构化 dict
 - [ ] model_id 从 state 获取，不硬编码
 
+## `tools.py`
+
+- [ ] 使用 `@tool` 装饰器
+- [ ] 所有函数为 `async` 异步函数
+- [ ] docstring 清晰描述功能
+- [ ] 统一返回格式：
+  - [ ] 成功：`{"success": True, "data": ..., "message": ...}`
+  - [ ] 失败：`{"success": False, "error": ...}`
+- [ ] 所有异常被捕获并返回统一格式
+- [ ] 导出列表命名：`AGENT_NAME_TOOLS`
+- [ ] 辅助函数以 `_` 开头（私有）
+- [ ] 不在 tool 中直接 print
+
+## `_shared/base_tools.py`（共享工具）
+
+- [ ] 仅放可复用的通用工具
+- [ ] 遵循与 `tools.py` 相同规范
+
 ## 命名规范
 
 - [ ] 节点名（add_node）：中文（`"上下文管理"`）
 - [ ] 函数名（nodes.py）：`xxx_node`
+- [ ] 工具函数（tools.py）：`xxx_tool`
+- [ ] 工具导出：`AGENT_NAME_TOOLS`
 - [ ] 路由函数：`route_xxx` 或 `decide_xxx`
 - [ ] Agent 名称：小写下划线（`my_agent`）
 
