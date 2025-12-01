@@ -1,0 +1,9 @@
+# Schema 元数据缓存目录
+# 
+# 此目录存放探索发现的 schema 文档，由脚本动态生成：
+# - sqlalchemy_models.md
+# - pydantic_models.md
+# - collection_schemas.md
+# - ...
+#
+# 每次探索新项目时会更新这里的内容
