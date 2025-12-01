@@ -8,7 +8,7 @@
   - 只读操作，不执行任何写入
   - 单表最多获取 100 条样本数据
   - 查询间隔 100ms，避免高频 IO
-  - 总表数限制 500，超过需手动指定
+  - 总表数限制 20，超过需手动指定
   - 连接超时 10s，查询超时 30s
   - 生产环境建议在从库执行
 
@@ -26,7 +26,7 @@ from pathlib import Path
 from datetime import datetime
 
 # ========== 安全限制配置 ==========
-MAX_TABLES = 500          # 最大表数量，超过需手动指定表名
+MAX_TABLES = 20           # 最大表数量，超过需手动指定表名
 QUERY_INTERVAL = 0.1      # 查询间隔（秒），避免高频 IO
 CONNECT_TIMEOUT = 10      # 连接超时（秒）
 QUERY_TIMEOUT = 30        # 查询超时（秒）
