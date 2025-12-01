@@ -223,6 +223,112 @@ claude-skill update data-exploration
 claude-skill update --all
 ```
 
+## 脚本封装（来自 myclaude 项目洞察）
+
+### Skill 目录结构模式
+
+```
+skills/
+├── codex/                    # Skill 模块
+│   ├── SKILL.md              # 提示词定义
+│   └── scripts/
+│       └── codex.py          # 执行脚本
+└── gemini/
+    ├── SKILL.md
+    └── scripts/
+        └── gemini.py
+```
+
+**关键点**：
+- 每个 Skill 是一个独立目录
+- `SKILL.md` 定义提示词和使用说明
+- `scripts/` 存放实际执行脚本
+- 命名一致：目录名 = 脚本名
+
+### 脚本与提示词的关系
+
+```
+SKILL.md (提示词)  ←→  scripts/*.py (执行器)
+     ↓                      ↓
+  告诉 Claude              实际执行
+  什么时候调用              封装 CLI 调用
+  怎么调用                  处理输入输出
+```
+
+### 脚本标准模式
+
+```python
+#!/usr/bin/env python3
+# /// script
+# requires-python = ">=3.8"
+# dependencies = []
+# ///
+
+import subprocess
+import sys
+import os
+
+DEFAULT_MODEL = os.environ.get('MODEL', 'default')
+DEFAULT_TIMEOUT = 7200  # 2小时
+
+def log_error(msg): sys.stderr.write(f"ERROR: {msg}\n")
+def log_warn(msg): sys.stderr.write(f"WARN: {msg}\n")
+def log_info(msg): sys.stderr.write(f"INFO: {msg}\n")
+
+def parse_args():
+    if len(sys.argv) < 2:
+        log_error('Task required')
+        sys.exit(1)
+    return {'task': sys.argv[1], 'workdir': sys.argv[2] if len(sys.argv) > 2 else '.'}
+
+def build_cli_args(params) -> list:
+    return ['cli', '-m', DEFAULT_MODEL, params['task']]
+
+def run_process(args, timeout):
+    try:
+        process = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        returncode = process.wait(timeout=timeout)
+        if returncode != 0:
+            log_error(f'Exit status {returncode}')
+            sys.exit(returncode)
+    except subprocess.TimeoutExpired:
+        log_error('Timeout')
+        process.kill()
+        sys.exit(124)
+    except FileNotFoundError:
+        log_error('Command not found')
+        sys.exit(127)
+
+def main():
+    params = parse_args()
+    args = build_cli_args(params)
+    run_process(args, DEFAULT_TIMEOUT)
+
+if __name__ == '__main__':
+    main()
+```
+
+### 脚本调用方式
+
+```bash
+# 方式1: uv run (推荐)
+uv run ~/.claude/skills/gemini/scripts/gemini.py "prompt"
+
+# 方式2: 直接执行
+~/.claude/skills/gemini/scripts/gemini.py "prompt"
+
+# 方式3: python 调用
+python3 ~/.claude/skills/gemini/scripts/gemini.py "prompt"
+```
+
+### 脚本必须处理的事项
+
+- [ ] 参数解析和验证
+- [ ] 超时控制 (默认 2 小时)
+- [ ] 错误处理 (FileNotFoundError, TimeoutExpired, KeyboardInterrupt)
+- [ ] 输出规范化
+- [ ] 日志分级 (INFO/WARN/ERROR 到 stderr)
+
 ## 下一步
 
 阅读 [06-skills-evaluation.md](06-skills-evaluation.md) 了解效果评估指标。

@@ -188,6 +188,99 @@ Markdown 报告，包含以下章节：
 └──────────────────────────────────────────────┘
 ```
 
+## 实战写作技巧（来自 myclaude 项目洞察）
+
+### SKILL.md 标准文档结构
+
+```markdown
+---
+name: skill-name
+description: 一句话说明什么时候用（核心）
+---
+
+# [Skill Name] Integration
+
+## Overview
+[简要说明功能]
+
+## When to Use
+[明确使用场景 - 这是最重要的部分]
+
+## Usage
+[具体调用方式]
+
+## Parameters
+[参数说明，用表格]
+
+## Return Format
+[输出格式，用代码块精确展示]
+
+## Invocation Pattern
+[调用模式，包括 Bash tool 参数]
+
+## Examples
+[从简单到复杂的示例]
+
+## Notes
+[补充说明]
+```
+
+### 写作核心原则
+
+| 原则 | 说明 | 示例 |
+|------|------|------|
+| **场景优先** | When to Use 是最重要的部分 | "Complex reasoning tasks requiring advanced AI" |
+| **格式明确** | 输入输出格式必须精确 | 返回格式用代码块展示 |
+| **示例驱动** | 从简单到复杂的示例 | Basic → With params → Advanced |
+| **约束前置** | 关键限制要突出 | timeout: 7200000 (non-negotiable) |
+
+### 关键技巧
+
+**技巧一：Invocation Pattern 定死调用方式**
+
+```yaml
+Bash tool parameters:
+- command: skill-wrapper - [working_dir] <<'EOF'
+  <task content>
+  EOF
+- timeout: 7200000
+- description: <brief description>
+```
+
+**技巧二：Return Format 结构化**
+
+```markdown
+### Return Format
+
+正常输出：
+```
+Response text...
+
+---
+SESSION_ID: 019a7247-xxx
+```
+
+错误输出 (stderr)：
+```
+ERROR: Error message
+```
+```
+
+**技巧三：Examples 覆盖三种场景**
+
+```markdown
+**Basic (最简单):**
+command "simple task"
+
+**Multiline (复杂输入):**
+command <<'EOF'
+multiline content
+EOF
+
+**Resume (高级用法):**
+command resume <session_id> "continue"
+```
+
 ## 下一步
 
 阅读 [03-skills-integration.md](03-skills-integration.md) 了解各部分如何联动。
