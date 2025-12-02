@@ -1,0 +1,6 @@
+{
+  "name": "data-explorer",
+  "description": "数据层探索专家。查询数据、理解结构、优化性能时使用",
+  "version": "1.0.0",
+  "commands": ["./SKILL.md"]
+}
