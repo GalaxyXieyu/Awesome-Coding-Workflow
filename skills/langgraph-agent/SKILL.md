@@ -126,6 +126,17 @@ src/application/agents/
 
 ## 约束条件
 
+- **LLM 调用规范**
+  - 必须使用项目内置的 `get_model_router().build_llm()`，禁止自己封装
+  - `model_id` 从 state 获取，不要硬编码
+  ```python
+  from src.infrastructure.ai.models.router import get_model_router
+  
+  router = get_model_router()
+  llm = router.build_llm(model_id=state.get("model_id"), temperature=0.1)
+  response = await llm.ainvoke(messages)
+  ```
+
 - **命名规范**
   - 节点名（add_node）：中文（`"上下文管理"`）
   - 函数名：`xxx_node`（小写下划线）
@@ -144,6 +155,7 @@ src/application/agents/
   - 不要在 `__init__.py` 导出 workflow/State
   - 不要硬编码 model_id，必须从 state 获取
   - 不要跳过 Writer 直接 print
+  - 不要自己封装 LLM 调用，使用 `get_model_router().build_llm()`
 
 ## 参考资料
 
