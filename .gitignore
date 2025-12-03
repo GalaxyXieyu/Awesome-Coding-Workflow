@@ -1,25 +1,23 @@
-# OS
+# 敏感配置 - 包含 API Key 和 Token
+settings.json
+settings.local.json
+config.json
+
+# 插件相关 - 从远程拉取，不需要同步
+plugins/
+
+# 运行时数据 - 本地生成
+history.jsonl
+logs/
+debug/
+file-history/
+shell-snapshots/
+session-env/
+statsig/
+ide/
+plans/
+todos/
+projects/
+
+# 系统文件
 .DS_Store
-Thumbs.db
-
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# Logs
-*.log
-
-# Temp
-tmp/
-temp/
-*.tmp
-
-# Build
-dist/
-build/
-
-# Local config
-.env
-.env.local

@@ -1,6 +1,0 @@
-{
-  "name": "agent-architector",
-  "description": "设计和实现 AutoAgents/LangGraph Agent 的架构专家",
-  "version": "1.0.0",
-  "commands": ["./SKILL.md"]
-}
