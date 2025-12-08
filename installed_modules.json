@@ -1,0 +1,43 @@
+{
+  "installed_at": "2025-12-08T14:33:45.790069",
+  "modules": {
+    "dev": {
+      "module": "dev",
+      "status": "success",
+      "operations": [
+        {
+          "type": "merge_dir",
+          "status": "success"
+        },
+        {
+          "type": "copy_file",
+          "status": "success"
+        },
+        {
+          "type": "copy_file",
+          "status": "success"
+        },
+        {
+          "type": "run_command",
+          "status": "success"
+        }
+      ],
+      "installed_at": "2025-12-08T14:31:51.275341"
+    },
+    "essentials": {
+      "module": "essentials",
+      "status": "success",
+      "operations": [
+        {
+          "type": "merge_dir",
+          "status": "success"
+        },
+        {
+          "type": "copy_file",
+          "status": "success"
+        }
+      ],
+      "installed_at": "2025-12-08T14:33:45.789223"
+    }
+  }
+}
