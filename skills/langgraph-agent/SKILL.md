@@ -1,6 +1,12 @@
 ---
 name: langgraph-agent
 description: 基于 LangGraph 构建生产级 Agent，涵盖 State/Node/Router/HITL 模式
+tags:
+  - langgraph
+  - agent
+  - state-machine
+  - workflow
+  - hitl
 ---
 
 # LangGraph Agent 开发专家

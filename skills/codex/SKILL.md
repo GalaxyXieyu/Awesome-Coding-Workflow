@@ -1,6 +1,12 @@
 ---
 name: codex
 description: Execute Codex CLI for code analysis, refactoring, and automated code changes. Use when you need to delegate complex code tasks to Codex AI with file references (@syntax) and structured output.
+tags:
+  - codex
+  - cli
+  - code-analysis
+  - refactoring
+  - ai-tools
 ---
 
 # Codex CLI Integration

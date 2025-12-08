@@ -1,6 +1,12 @@
 ---
 name: skill-builder
 description: 创建、扫描、Debug、迭代 Claude Code Skills 的管理智能体
+tags:
+  - skill
+  - builder
+  - management
+  - claude-code
+  - agent
 ---
 
 # Skill 管理智能体

@@ -1,6 +1,12 @@
 ---
 name: data-explorer
 description: 数据层探索专家。查询数据、理解结构、优化性能时使用。复用现有方法，避免重复造轮子。只要跟数据服务探索相关的都优先使用这个 skills
+tags:
+  - data
+  - database
+  - explore
+  - query
+  - data-layer
 ---
 
 # 数据探索专家
